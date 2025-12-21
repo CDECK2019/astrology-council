@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { EtherealBackground } from "@/components/EtherealBackground";
 import { RasiChart } from "@/components/RasiChart";
+import { BirthChartTable } from "@/components/BirthChartTable";
 import { motion } from "framer-motion";
 import { COUNCIL_MEMBERS } from "@/lib/llm";
 import { User, Volume2, Sparkles, AlertCircle, ArrowLeft, Star } from "lucide-react";
@@ -85,6 +86,8 @@ export default function Dashboard() {
                             Your <span className="text-gradient">Cosmic Blueprint</span>
                         </h1>
                         <RasiChart data={data.chartData} />
+                        {/* Birth Chart Table */}
+                        <BirthChartTable chartData={data.chartData} />
                     </motion.div>
 
                     <motion.div

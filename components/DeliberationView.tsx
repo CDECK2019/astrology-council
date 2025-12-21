@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { BirthChartTable } from "./BirthChartTable";
 
 const DELIBERATION_QUOTES = [
     "The Council is consulting the ancient scrolls...",
@@ -13,7 +14,11 @@ const DELIBERATION_QUOTES = [
     "Synthesizing the collective wisdom of the spheres...",
 ];
 
-export const DeliberationView = () => {
+interface DeliberationViewProps {
+    chartData?: any;
+}
+
+export const DeliberationView = ({ chartData }: DeliberationViewProps) => {
     const [quoteIndex, setQuoteIndex] = useState(0);
 
     useEffect(() => {
@@ -157,6 +162,9 @@ export const DeliberationView = () => {
                         />
                     ))}
                 </div>
+
+                {/* Birth Chart Table - shown once chart data is loaded */}
+                {chartData && <BirthChartTable chartData={chartData} />}
             </div>
         </motion.div>
     );
