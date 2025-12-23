@@ -121,6 +121,47 @@ export async function getCouncilReviews(chartData: any) {
                     - Signs: Capricorn(Own), Aquarius(Own), Libra(Exalted).
    - Must be in House 1, 4, 7, or 10.
 
+**KNOWLEDGE CONTEXT: WEALTH & POWER YOGAS (SUPPLEMENTAL)**
+Look for these specific combinations to boost the Auspiciousness score:
+1. **Lakshmi Yoga** (Tier 2):
+   - 9th Lord in Own/Exaltation sign AND placed in Kendra (1,4,7,10) or Trikona (1,5,9).
+   - Lagna Lord must be strong (Kendra/Trikona/Own/Exalted).
+   - Bonus: +2 to +3 points (Full +3 if both lords Exalted/Own).
+2. **Viparita Raja Yoga** (Tier 2):
+   - Lords of Dusthana (6,8,12) placed in OTHER Dusthana houses (e.g., 6th lord in 8th/12th).
+   - Main types: Harsha, Sarala, Vimala. 
+   - Bonus: +2 to +3 points (Unexpected rise).
+3. **Parvata Yoga** (Tier 2):
+   - Benefics in Kendras (1,4,7,10) AND 6th/8th houses empty or occupied by benefics.
+   - Bonus: +2 to +3 points (Enduring status).
+4. **Vasumati Yoga** (Tier 3 - Special):
+   - Benefics (Jupiter, Venus, Mercury) in Upachaya houses (3,6,10,11).
+   - Bonus: +0.5 per benefic (Max +1.5).
+5. **Kahal Yoga** (Tier 3):
+   - 4th Lord and 9th Lord in mutual Kendras; OR 4th Lord Exalted/Own aspected by 10th Lord.
+   - Bonus: +1 point (Courage/Authority).
+
+**KNOWLEDGE CONTEXT: MANIFESTATION YOGAS (SUPPLEMENTAL)**
+Look for these combinations to boost the "Manifestation capability" score:
+1. **Shakti Yoga** (Manifestation):
+   - Mars (or Malefics) strong in 3rd House; OR Mars Exalted/Own aspecting 11th House.
+   - Bonus: +1.5 to +2 points (Full +2 if Mars Exalted + 3rd House involvement).
+2. **Saraswati Yoga** (Manifestation/Intellect):
+   - Jupiter, Venus, Mercury in Kendra/Trikona or Strong (Exalted/Own).
+   - Bonus: +1.5 to +2 points (Creation through wisdom/arts).
+
+**KNOWLEDGE CONTEXT: PSYCHIC & SUPERNATURAL YOGAS (SUPPLEMENTAL)**
+Look for these combinations to boost the "Supernatural abilities" score:
+1. **Kala Sarpa Yoga** (Spiritual Variant):
+   - All planets hemmed between Rahu and Ketu axis. Ketu in Moksha houses (4,8,12) enhances spiritual potential.
+   - Bonus: +1 to +2 points (Higher for Moksha/8th/12th axis).
+2. **Guru-Ketu Yoga** (Mystical):
+   - Jupiter conjunct or aspecting Ketu; or in same Nakshatra.
+   - Bonus: +1.5 to +2.5 points (Past-life wisdom).
+3. **Chandra-Rahu/Ketu Yoga** (Node-Moon):
+   - Moon conjunct or aspecting Rahu (intuition) or Ketu (psychic insight).
+   - Bonus: +1 to +2 points.
+
 **KNOWLEDGE CONTEXT: PSYCHIC & SUPERNATURAL ABILITY**
 To score "Supernatural abilities", look for these indicators:
 1. **Ketu Influence (The Mystic):**
@@ -129,17 +170,22 @@ To score "Supernatural abilities", look for these indicators:
 2. **Water Element (Intuition):**
    - Ascendant or Moon in Cancer, Scorpio, or Pisces (+1.5 points each).
 3. **Moksha Houses (Hidden Realms):**
-   - Planets in 8th House (+1 point).
    - Planets in 12th House (+1 point).
    - Jupiter aspecting Moon/Asc (+1 point).
+4. **Specific Yogas (Cumulative Bonuses):**
+   - **Guru-Ketu Yoga:** +1.5 to +2.5.
+   - **Kala Sarpa Yoga (Spiritual):** +1 to +2.
+   - **Chandra-Rahu/Ketu:** +1 to +2.
+   - **Penalty:** Moon severely afflicted (combust/debilitated without cancellation) (-1).
 *Base Score: 1. Max Score: 10.*
 
 **KNOWLEDGE CONTEXT: YOGA SCORING TIERS**
-Score "Auspiciousness" based on the MAGNITUDE of Yogas, not just quantity.
-- **TIER 1 (Great Man):** Any Mahapurusha Yoga (Sasa, Ruchaka, Bhadra, Hamsa, Malavya) = **+5 Points** (Minimum Score 8/10).
-- **TIER 2 (Major):** Raja Yogas (Kendra+Trikona Lord connection), Dhana Yogas (Wealth), or Gaja Kesari (Jupiter in Kendra from Moon) = **+2 Points**.
-- **TIER 3 (Common):** Budhaditya, Chandra-Mangala, Adhi Yoga = **+0.5 Points**.
-*Base Score: 3. Max Score: 10.*
+Score "Auspiciousness" based on the MAGNITUDE of Yogas.
+- **Base Score:** 3. **Max Score:** 10.
+- **TIER 1 (Great Man):** Mahapurusha Yogas (Sasa, Ruchaka, Bhadra, Hamsa, Malavya) = **+5 Points** (Min Total 8/10).
+- **TIER 2 (Major):** Lakshmi, Viparita Raja, Parvata, Raja/Dhana Yogas = **+2 to +3 Points**.
+- **TIER 3 (Common/Supportive):** Kahal (+1), Vasumati (scaled +0.5 to +1.5), Budhaditya/Adhi (+0.5).
+- **CRITICAL CONDITION:** Planets must NOT be severely afflicted (combustion or debilitation without cancellation) to award full points.
 
 **KNOWLEDGE CONTEXT: CAREER (10th House)**
 Score "Professional success" based on Authority and Karma.
@@ -158,8 +204,12 @@ Score "Relationships" based on Harmony vs. Discord.
 **KNOWLEDGE CONTEXT: MANIFESTATION (3rd & 11th House)**
 Score "Ability to bring desires into reality" based on Willpower (3rd) and Gains (11th).
 - **Gains:** Planets in 11th (+1 each). Lord of 11th Strong (+2).
-- **Willpower:** Malefics (Mars, Sat, Rahu) in 3rd (+1.5). Lord of 3rd Strong (+1).
-- **Mars:** Exalted/Own (+2).
+   - **Willpower:** Malefics (Mars, Sat, Rahu) in 3rd (+1.5). Lord of 3rd Strong (+1).
+   - **Shakti Yoga:** +1.5 to +2.
+   - **Saraswati Yoga:** +1.5 to +2.
+   - **Mars:** Exalted/Own (+2).
+   - **Penalty:** Mars weak/afflicted (-1).
+
 *Base Score: 2. Max Score: 10.*
 
 YOUR TASK:
@@ -167,6 +217,8 @@ YOUR TASK:
 2. ** CRITICAL FIRST STEP **: Perform a strict technical check for ** Mahapurusha Yogas** (Planets Exalted or in Own Sign in Kendra / Angular houses 1, 4, 7, 10).
    - If found, you MUST explicitly name them (e.g., "Sasa Yoga present due to Saturn Exalted in 1st House").
    - If not found, explicitly state "No Mahapurusha Yogas".
+3. ** SECONDARY CHECK **: Identify any **Wealth, Power, Manifestation, or Supernatural Yogas** defined in the context (Lakshmi, Shakti, etc.).
+   - Explicitly name them if the criteria are met.
 3. Provide a brief narrative summary highlighting the most important placements.
 4. Score the following criteria on a scale of 1 - 10 using a simple list format (e.g., "Auspiciousness: 8/10"):
 ${SCORING_CRITERIA}
