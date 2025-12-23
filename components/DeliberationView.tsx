@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { BirthChartTable } from "./BirthChartTable";
 
-const DELIBERATION_QUOTES = [
-    "The Council is consulting the ancient scrolls...",
-    "Aligning your birth data with the celestial spheres...",
-    "The Sage of Wisdom is interpreting your karma...",
-    "The Scholar of Tradition is calculating planetary dashas...",
-    "The Architect of Life is drafting your cosmic blueprint...",
-    "Synthesizing the collective wisdom of the spheres...",
+const STAGES = [
+    "Stage 1: Council Members are analyzing your chart...",
+    "Stage 2: Peer Review in progress - Checking for accuracy...",
+    "Stage 3: The Council President is synthesizing the final decree...",
+    "Finalizing the cosmic revelation...",
 ];
 
 interface DeliberationViewProps {
@@ -19,13 +17,23 @@ interface DeliberationViewProps {
 }
 
 export const DeliberationView = ({ chartData }: DeliberationViewProps) => {
-    const [quoteIndex, setQuoteIndex] = useState(0);
+    const [stage, setStage] = useState(0);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setQuoteIndex((prev) => (prev + 1) % DELIBERATION_QUOTES.length);
-        }, 4000);
-        return () => clearInterval(interval);
+        // Simulate progress through stages (total ~12s wait matches typical LLM time)
+        const times = [4000, 5000, 4000, 3000];
+
+        let currentStage = 0;
+        const nextStage = () => {
+            if (currentStage < STAGES.length - 1) {
+                currentStage++;
+                setStage(currentStage);
+                setTimeout(nextStage, times[currentStage]);
+            }
+        };
+
+        const timer = setTimeout(nextStage, times[0]);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
@@ -123,14 +131,14 @@ export const DeliberationView = ({ chartData }: DeliberationViewProps) => {
                     <div className="h-10">
                         <AnimatePresence mode="wait">
                             <motion.p
-                                key={quoteIndex}
+                                key={stage}
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
                                 transition={{ duration: 0.5 }}
                                 className="text-accent-indigo/80 text-lg italic font-medium"
                             >
-                                "{DELIBERATION_QUOTES[quoteIndex]}"
+                                "{STAGES[stage]}"
                             </motion.p>
                         </AnimatePresence>
                     </div>

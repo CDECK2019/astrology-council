@@ -159,7 +159,7 @@ export default function Dashboard() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.6 + i * 0.1 }}
-                                    className="glass-card p-6 sm:p-8 relative overflow-hidden group"
+                                    className="glass-card p-6 sm:p-8 relative group"
                                     style={{
                                         borderTop: `2px solid ${MEMBER_COLORS[i]}30`,
                                     }}
@@ -199,6 +199,41 @@ export default function Dashboard() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Peer Reviews Section (Collapsible or just listed) */}
+                    {data.peerReviews && data.peerReviews.length > 0 && (
+                        <div className="space-y-6">
+                            <motion.h3
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.7 }}
+                                className="text-lg font-bold text-white uppercase tracking-[0.15em] border-l-4 border-accent-rose pl-4 font-cinzel"
+                            >
+                                Peer Review Log
+                            </motion.h3>
+                            <div className="grid grid-cols-1 gap-5">
+                                {data.peerReviews.map((review: any, i: number) => (
+                                    <motion.div
+                                        key={`peer-${i}`}
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.8 + i * 0.1 }}
+                                        className="glass-card p-6 bg-opacity-40 border-accent-rose/20"
+                                    >
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <AlertCircle className="text-accent-rose w-5 h-5" />
+                                            <span className="text-accent-rose font-bold uppercase tracking-wider text-sm">
+                                                Critique by {review.reviewerName}
+                                            </span>
+                                        </div>
+                                        <div className="prose-cosmic prose prose-sm prose-invert max-w-none text-gray-400">
+                                            <ReactMarkdown>{review.rankings}</ReactMarkdown>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

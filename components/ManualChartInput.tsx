@@ -174,7 +174,7 @@ export const ManualChartInput = ({ onSubmit }: ManualChartInputProps) => {
                 padding: "2rem",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
                 position: "relative",
-                overflow: "hidden",
+                // overflow: "hidden", // Removed to allow dropdowns to overflow
                 width: "100%",
                 maxWidth: "700px",
             }}
@@ -362,13 +362,13 @@ export const ManualChartInput = ({ onSubmit }: ManualChartInputProps) => {
                                         onClick={(e) => e.stopPropagation()}
                                         style={{
                                             position: "absolute",
-                                            top: "100%",
+                                            [index > 5 ? "bottom" : "top"]: "100%",
                                             left: 0,
                                             right: 0,
                                             background: "rgba(26, 22, 37, 0.98)",
                                             border: "1px solid rgba(129, 140, 248, 0.2)",
                                             borderRadius: "0.5rem",
-                                            marginTop: "0.25rem",
+                                            [index > 5 ? "marginBottom" : "marginTop"]: "0.25rem",
                                             zIndex: 50,
                                             boxShadow: "0 10px 25px rgba(0, 0, 0, 0.5)",
                                             maxHeight: "200px",
