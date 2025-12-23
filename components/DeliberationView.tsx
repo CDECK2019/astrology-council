@@ -170,9 +170,6 @@ export const DeliberationView = ({ chartData }: DeliberationViewProps) => {
                         />
                     ))}
                 </div>
-
-                {/* Birth Chart Table - shown once chart data is loaded */}
-                {chartData && <BirthChartTable chartData={chartData} />}
             </div>
         </motion.div>
     );

@@ -85,8 +85,6 @@ export default function Dashboard() {
                         <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-white font-cinzel tracking-tight">
                             Your <span className="text-gradient">Cosmic Blueprint</span>
                         </h1>
-                        <RasiChart data={data.chartData} />
-                        {/* Birth Chart Table */}
                         <BirthChartTable chartData={data.chartData} />
                     </motion.div>
 
@@ -192,7 +190,7 @@ export default function Dashboard() {
                                             <div className="text-base text-white font-medium">{review.role}</div>
                                         </div>
                                     </div>
-                                    <div className="prose-cosmic prose prose-sm prose-invert max-w-none text-gray-400 overflow-x-auto">
+                                    <div className="prose-cosmic prose prose-invert max-w-none text-gray-300 leading-relaxed">
                                         <ReactMarkdown>{review.content}</ReactMarkdown>
                                     </div>
                                 </motion.div>
