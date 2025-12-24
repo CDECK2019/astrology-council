@@ -122,29 +122,62 @@ export function evaluateYogas(chartData: ChartData): YogaEvaluationResult {
     const auspiciousYogas = [...mahapurushaYogas, ...generalYogas];
     const allYogas = [...auspiciousYogas, ...mysticalYogas];
 
-    let score = 5;
+    let score = 5; // Base
     let reasoningParts: string[] = [];
 
-    if (mahapurushaYogas.length > 0) {
-        reasoningParts.push(`${mahapurushaYogas.length} Great Person (Mahapurusha) Yoga(s) detected, indicating exceptional potential`);
+    // Tier 1: Mahapurusha Yogas (The Gold Standard)
+    if (mahapurushaYogas.length >= 1) {
+        score = 8;
+        if (mahapurushaYogas.length >= 2) {
+            score = 10;
+            reasoningParts.push("Multiple Great Person (Mahapurusha) Yogas detected, indicating legendary potential");
+        } else {
+            reasoningParts.push("Great Person (Mahapurusha) Yoga detected, indicating exceptional potential");
+        }
     }
 
-    if (auspiciousYogas.length >= 1) {
-        if (auspiciousYogas.length >= 2) {
-            score = 10;
-            reasoningParts.push("Multiple powerful yogas amplify the chart's auspiciousness to the highest degree");
-        } else {
+    // Tier 2: Powerful Auspicious Yogas (Gaja Kesari)
+    const tier2Yogas = generalYogas.filter(y => y.includes("Gaja Kesari"));
+    const hasTier2 = tier2Yogas.length > 0;
+
+    if (hasTier2) {
+        if (score < 8) {
             score = 8;
-            reasoningParts.push("Presence of auspicious yoga indicates strong karmic support");
+            reasoningParts.push("Powerful Auspicious Yoga (Gaja Kesari) detected, ensuring success");
+        } else if (score === 8) {
+            score = 10; // Mahapurusha + Gaja Kesari = 10
+            reasoningParts.push("Combination of Mahapurusha and Gaja Kesari Yoga amplifies chart to highest degree");
         }
-    } else {
+    }
+
+    // Tier 3: General Supportive Yogas (Budhaditya, Chandra Mangala)
+    // These add minor boosts but do not push score to 10 unless combined with Tier 1/2
+    const tier3Yogas = generalYogas.filter(y => !y.includes("Gaja Kesari"));
+    if (tier3Yogas.length > 0) {
+        if (score < 8) {
+            score += 1; // Minor boost to base
+            reasoningParts.push("Supportive yogas present, adding strength to the chart");
+        } else if (score === 8) {
+            // Check if Tier 2 was already applied. If it was, we are at 8. 
+            // If Tier 1 was applied, we are at 8.
+            // If Tier 2 (Gaja Kesari) is also present, it would have pushed to 10 already.
+            // So if we are at 8 here, it means we have [1 Mahapurusha OR 1 Gaja Kesari] AND [Tier 3 yoga].
+            // This should sum to 9.
+            score = 9;
+            reasoningParts.push("Additional auspicious yogas support the primary placement, creating a robust chart");
+        }
+        // IMPORTANT: Be careful not to overwrite a 10 from Tier 1+2.
+        // The previous logic was: if (score === 8) score = 9. 
+        // If score is already 10 (from Mahapurusha + Gaja Kesari), this block does nothing, which is correct.
+    }
+
+    // Fallback reasoning
+    if (reasoningParts.length === 0) {
         reasoningParts.push("No major auspicious yogas detected; chart relies on planetary strength");
     }
 
-    if (mahapurushaYogas.length > 0 && score < 9) score = 9;
-
     return {
-        score,
+        score: Math.min(10, score),
         yogaCount: allYogas.length,
         yogasIdentified: allYogas,
         reasoning: reasoningParts.join(". ") + ".",

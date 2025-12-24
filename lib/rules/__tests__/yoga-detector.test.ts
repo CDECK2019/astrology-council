@@ -193,7 +193,7 @@ describe("Yoga Detection", () => {
             { house: 5, sign: "Leo", planets: ["Sun", "Mercury"] }
         ]);
         const result = evaluateYogas(chart);
-        expect(result.score).toBe(8);
+        expect(result.score).toBe(6); // Base 5 + 1 (Tier 3)
         expect(result.yogaCount).toBe(1);
     });
 
@@ -202,17 +202,27 @@ describe("Yoga Detection", () => {
             { house: 1, sign: "Libra", planets: ["Saturn"] }
         ]);
         const result = evaluateYogas(chart);
-        expect(result.score).toBe(9); // Mahapurusha bonus
+        expect(result.score).toBe(8); // Mahapurusha base (Tier 1)
         expect(result.yogaCount).toBe(1);
     });
 
-    test("Score = 10 with 2 yogas (e.g., Sasa + Budhaditya)", () => {
+    test("Score = 9 with Mahapurusha + General (Sasa + Budhaditya)", () => {
         const chart = buildChart([
             { house: 1, sign: "Libra", planets: ["Saturn"] },
             { house: 3, sign: "Gemini", planets: ["Sun", "Mercury"] }
         ]);
         const result = evaluateYogas(chart);
-        expect(result.score).toBe(10);
+        expect(result.score).toBe(9); // Corrected: Mahapurusha + General = 9
         expect(result.yogaCount).toBe(2);
     });
+    test("Score = 10 with Mahapurusha + Gaja Kesari (Tier 1 + Tier 2)", () => {
+        const chart = buildChart([
+            { house: 1, sign: "Aries", planets: ["Moon"] },
+            { house: 4, sign: "Cancer", planets: ["Jupiter"] } // Jupiter exalted in 4th (Hamsa) + 4th from Moon 1 (Gaja Kesari)
+        ]);
+        const result = evaluateYogas(chart);
+        expect(result.score).toBe(10);
+        expect(result.yogaCount).toBeGreaterThanOrEqual(2);
+    });
+
 });
