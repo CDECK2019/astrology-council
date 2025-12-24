@@ -29,14 +29,14 @@ export interface YogaEvaluationResult extends EvaluationResult {
 export interface CareerEvaluationResult extends EvaluationResult { }
 export interface LoveEvaluationResult extends EvaluationResult { }
 export interface ManifestationEvaluationResult extends EvaluationResult { }
-export interface SpiritualEvaluationResult extends EvaluationResult { }
+export interface SupernaturalEvaluationResult extends EvaluationResult { }
 
 export interface CouncilReport {
     auspiciousness: YogaEvaluationResult;
     career: EvaluationResult;
     manifestation: EvaluationResult;
     love: EvaluationResult;
-    spiritual: EvaluationResult;
+    supernatural: EvaluationResult;
     synthesis: string;
 }
 

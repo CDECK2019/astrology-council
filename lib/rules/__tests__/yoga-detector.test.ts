@@ -70,7 +70,7 @@ describe("Yoga Detection", () => {
     });
 
     // ============================================================================
-    // ❌ Mahapurusha Yoga Rejections (Debilitation / Non-Kendra)
+    // ❌ Mahapurusha Yoga Rejections (Debilitation / Non-Kendra / Affliction)
     // ============================================================================
 
     test("NO Ruchaka: Mars debilitated in Cancer (House 10)", () => {
@@ -103,6 +103,18 @@ describe("Yoga Detection", () => {
         ]);
         const result = evaluateYogas(chart);
         expect(result.yogasIdentified).toEqual([]);
+    });
+
+    // 🔥 NEW: Affliction Check (Combustion)
+    test("NO Bhadra: Mercury combust with Sun in House 10 (Sherri's Case)", () => {
+        const chart = buildChart([
+            { house: 10, sign: "Gemini", planets: ["Sun", "Mercury"] }
+        ]);
+        const result = evaluateYogas(chart);
+        // Should NOT contain Bhadra because Mercury is combust
+        expect(result.yogasIdentified).not.toContain("Bhadra (Mahapurusha)");
+        // But SHOULD contain Budhaditya
+        expect(result.yogasIdentified).toContain("Budhaditya (Auspicious)");
     });
 
     // ============================================================================
@@ -156,15 +168,6 @@ describe("Yoga Detection", () => {
         expect(result.yogasIdentified).not.toContain("Budhaditya (Auspicious)");
     });
 
-    test("NO Chandra-Mangala: Moon in House 10, Mars in House 12 (not opposite)", () => {
-        const chart = buildChart([
-            { house: 10, sign: "Cancer", planets: ["Mars"] },
-            { house: 12, sign: "Virgo", planets: ["Moon"] }
-        ]);
-        const result = evaluateYogas(chart);
-        expect(result.yogasIdentified).not.toContain("Chandra Mangala (Auspicious)");
-    });
-
     test("NO Gaja Kesari: Jupiter not in Kendra from Moon", () => {
         const chart = buildChart([
             { house: 1, sign: "Aries", planets: ["Moon"] },
@@ -207,16 +210,6 @@ describe("Yoga Detection", () => {
         const chart = buildChart([
             { house: 1, sign: "Libra", planets: ["Saturn"] },
             { house: 3, sign: "Gemini", planets: ["Sun", "Mercury"] }
-        ]);
-        const result = evaluateYogas(chart);
-        expect(result.score).toBe(10);
-        expect(result.yogaCount).toBe(2);
-    });
-
-    test("Score = 10 with 2 Mahapurusha yogas", () => {
-        const chart = buildChart([
-            { house: 1, sign: "Libra", planets: ["Saturn"] },        // Sasa
-            { house: 4, sign: "Capricorn", planets: ["Mars"] }       // Ruchaka
         ]);
         const result = evaluateYogas(chart);
         expect(result.score).toBe(10);

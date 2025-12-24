@@ -1,7 +1,8 @@
-import { ChartData, House, YogaEvaluationResult, CareerEvaluationResult, LoveEvaluationResult, ManifestationEvaluationResult, SpiritualEvaluationResult } from "../types";
+import { ChartData, House, YogaEvaluationResult, CareerEvaluationResult, LoveEvaluationResult, ManifestationEvaluationResult, SupernaturalEvaluationResult } from "../types";
+import { detectMysticalYogas, getPlanetHouse, getPlanetSign, isPlanetAfflicted } from "./mystical-yogas";
 
 // =============================================================================
-// �️ Helpers
+// 🛠️ Helpers
 // =============================================================================
 
 const SIGN_RULERS: Record<string, string> = {
@@ -15,7 +16,7 @@ function getPlanetForSign(sign: string): string {
 }
 
 // =============================================================================
-// �🔮 Yoga Detection (Mahapurusha + General)
+// 🔮 Yoga Detection (Mahapurusha + General + Mystical)
 // =============================================================================
 
 function detectMahapurushaYogas(chartData: ChartData): string[] {
@@ -33,7 +34,7 @@ function detectMahapurushaYogas(chartData: ChartData): string[] {
     // 1. Ruchaka Yoga (Mars)
     const { house: marsHouse, sign: marsSign } = getPlanetInfo("Mars");
     if (marsHouse && [1, 4, 7, 10].includes(marsHouse) && marsSign) {
-        if (["Aries", "Scorpio", "Capricorn"].includes(marsSign) && marsSign !== "Cancer") {
+        if (["Aries", "Scorpio", "Capricorn"].includes(marsSign) && !isPlanetAfflicted("Mars", chartData)) {
             yogas.push("Ruchaka (Mahapurusha)");
         }
     }
@@ -41,7 +42,7 @@ function detectMahapurushaYogas(chartData: ChartData): string[] {
     // 2. Bhadra Yoga (Mercury)
     const { house: mercuryHouse, sign: mercurySign } = getPlanetInfo("Mercury");
     if (mercuryHouse && [1, 4, 7, 10].includes(mercuryHouse) && mercurySign) {
-        if (["Gemini", "Virgo"].includes(mercurySign) && mercurySign !== "Pisces") {
+        if (["Gemini", "Virgo"].includes(mercurySign) && !isPlanetAfflicted("Mercury", chartData)) {
             yogas.push("Bhadra (Mahapurusha)");
         }
     }
@@ -49,7 +50,7 @@ function detectMahapurushaYogas(chartData: ChartData): string[] {
     // 3. Hamsa Yoga (Jupiter)
     const { house: jupiterHouse, sign: jupiterSign } = getPlanetInfo("Jupiter");
     if (jupiterHouse && [1, 4, 7, 10].includes(jupiterHouse) && jupiterSign) {
-        if (["Sagittarius", "Pisces", "Cancer"].includes(jupiterSign) && jupiterSign !== "Capricorn") {
+        if (["Sagittarius", "Pisces", "Cancer"].includes(jupiterSign) && !isPlanetAfflicted("Jupiter", chartData)) {
             yogas.push("Hamsa (Mahapurusha)");
         }
     }
@@ -57,7 +58,7 @@ function detectMahapurushaYogas(chartData: ChartData): string[] {
     // 4. Malavya Yoga (Venus)
     const { house: venusHouse, sign: venusSign } = getPlanetInfo("Venus");
     if (venusHouse && [1, 4, 7, 10].includes(venusHouse) && venusSign) {
-        if (["Taurus", "Libra", "Pisces"].includes(venusSign) && venusSign !== "Virgo") {
+        if (["Taurus", "Libra", "Pisces"].includes(venusSign) && !isPlanetAfflicted("Venus", chartData)) {
             yogas.push("Malavya (Mahapurusha)");
         }
     }
@@ -65,7 +66,7 @@ function detectMahapurushaYogas(chartData: ChartData): string[] {
     // 5. Sasa Yoga (Saturn)
     const { house: saturnHouse, sign: saturnSign } = getPlanetInfo("Saturn");
     if (saturnHouse && [1, 4, 7, 10].includes(saturnHouse) && saturnSign) {
-        if (["Capricorn", "Aquarius", "Libra"].includes(saturnSign) && saturnSign !== "Aries") {
+        if (["Capricorn", "Aquarius", "Libra"].includes(saturnSign) && !isPlanetAfflicted("Saturn", chartData)) {
             yogas.push("Sasa (Mahapurusha)");
         }
     }
@@ -113,18 +114,40 @@ function detectGeneralYogas(chartData: ChartData): string[] {
 export function evaluateYogas(chartData: ChartData): YogaEvaluationResult {
     const mahapurushaYogas = detectMahapurushaYogas(chartData);
     const generalYogas = detectGeneralYogas(chartData);
-    const allYogas = [...mahapurushaYogas, ...generalYogas];
+    const mysticalYogas = detectMysticalYogas(chartData);
+
+    // Scoring Logic:
+    // 1. Auspiciousness is driven by Mahapurusha & General Yogas.
+    // 2. Mystical Yogas do NOT inflate Auspiciousness (they feed Supernatural).
+    const auspiciousYogas = [...mahapurushaYogas, ...generalYogas];
+    const allYogas = [...auspiciousYogas, ...mysticalYogas];
 
     let score = 5;
-    if (allYogas.length >= 1) score = 8;
-    if (allYogas.length >= 2) score = 10;
+    let reasoningParts: string[] = [];
+
+    if (mahapurushaYogas.length > 0) {
+        reasoningParts.push(`${mahapurushaYogas.length} Great Person (Mahapurusha) Yoga(s) detected, indicating exceptional potential`);
+    }
+
+    if (auspiciousYogas.length >= 1) {
+        if (auspiciousYogas.length >= 2) {
+            score = 10;
+            reasoningParts.push("Multiple powerful yogas amplify the chart's auspiciousness to the highest degree");
+        } else {
+            score = 8;
+            reasoningParts.push("Presence of auspicious yoga indicates strong karmic support");
+        }
+    } else {
+        reasoningParts.push("No major auspicious yogas detected; chart relies on planetary strength");
+    }
+
     if (mahapurushaYogas.length > 0 && score < 9) score = 9;
 
     return {
         score,
         yogaCount: allYogas.length,
         yogasIdentified: allYogas,
-        reasoning: "Yogas verified by deterministic rules engine.",
+        reasoning: reasoningParts.join(". ") + ".",
         keyFindings: allYogas
     };
 }
@@ -135,6 +158,7 @@ export function evaluateYogas(chartData: ChartData): YogaEvaluationResult {
 
 export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
     let score = 3; // Base
+    let reasoningParts: string[] = [];
 
     // 10th house planets (Sun, Mars, Saturn, Jupiter = +1 each)
     const tenthHouse = chartData.houses.find(h => h.house === 10);
@@ -144,34 +168,39 @@ export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
             .filter(p => strongPlanets.includes(p.name))
             .length;
         score += strongCount;
+        if (strongCount > 0) {
+            reasoningParts.push(`Presence of powerful planets (${tenthHouse.planets.map(p => p.name).join(", ")}) in the 10th House boosts authority`);
+        }
     }
 
     // Lord of 10th in Kendra/Trikona (+2)
     const tenthLordSign = tenthHouse?.sign || "Aries"; // fallback
 
-    // FIXED: Removed redundant zodiac/tenthLord logic
     const tenthLordHouse = chartData.houses.find(h =>
         h.planets.some(p => p.name === getPlanetForSign(tenthLordSign))
     )?.house;
 
     if (tenthLordHouse && ([1, 4, 7, 10, 5, 9] as number[]).includes(tenthLordHouse)) {
         score += 2;
+        reasoningParts.push(`The Lord of the 10th House is strongly placed in House ${tenthLordHouse}, ensuring professional stability`);
     }
 
     // Amala Yoga: Benefic (Jup, Ven, Merc) in 10th (+2)
     if (tenthHouse) {
         const benefics = ["Jupiter", "Venus", "Mercury"];
-        if (tenthHouse.planets.some(p => benefics.includes(p.name))) {
+        const beneficPlanets = tenthHouse.planets.filter(p => benefics.includes(p.name));
+        if (beneficPlanets.length > 0) {
             score += 2;
+            reasoningParts.push(`Amala Yoga detected: Benefics in the 10th House (${beneficPlanets.map(p => p.name).join(", ")}) support righteous success`);
         }
     }
 
     // Sun strength (+1.5)
-    // OPTIMIZATION: Added null safety (optional but good practice)
     const sunHouseObj = chartData.houses.find(h => h.planets.some(p => p.name === "Sun")) || null;
     if (sunHouseObj) {
         if (sunHouseObj.sign === "Leo" || sunHouseObj.sign === "Aries") {
             score += 1.5;
+            reasoningParts.push("Sun is Exalted or in Own Sign, granting strong leadership capability");
         }
     }
 
@@ -180,12 +209,17 @@ export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
     if (saturnHouseObj) {
         if (["Capricorn", "Aquarius", "Libra"].includes(saturnHouseObj.sign)) {
             score += 1.5;
+            reasoningParts.push("Saturn is strong, providing discipline and endurance");
         }
     }
 
+    if (reasoningParts.length === 0) {
+        reasoningParts.push("Career path requires consistent effort to build momentum");
+    }
+
     return {
-        score: Math.min(10, Math.round(score * 2) / 2), // Cap at 10, allow .5
-        reasoning: "Career score calculated from 10th house strength, lord placement, and planetary dignity.",
+        score: Math.min(10, Math.round(score * 2) / 2),
+        reasoning: reasoningParts.join(". ") + ".",
         keyFindings: []
     };
 }
@@ -196,23 +230,29 @@ export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
 
 export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
     let score = 4; // Base
+    let reasoningParts: string[] = [];
 
     // 7th house benefics (+1.5 each)
     const seventhHouse = chartData.houses.find(h => h.house === 7);
     if (seventhHouse) {
         const benefics = ["Venus", "Jupiter", "Moon", "Mercury"];
-        const beneficCount = seventhHouse.planets
-            .filter(p => benefics.includes(p.name))
-            .length;
+        const beneficPlanets = seventhHouse.planets.filter(p => benefics.includes(p.name));
+        const beneficCount = beneficPlanets.length;
+
         score += beneficCount * 1.5;
+        if (beneficCount > 0) {
+            reasoningParts.push(`Benefics in 7th House (${beneficPlanets.map(p => p.name).join(", ")}) promote harmony`);
+        }
 
         // Malefics in 7th (-1)
-        // FIXED: Removed "Sun" from malefics in 7th House
         const malefics = ["Mars", "Saturn", "Rahu", "Ketu"];
-        const maleficCount = seventhHouse.planets
-            .filter(p => malefics.includes(p.name))
-            .length;
+        const maleficPlanets = seventhHouse.planets.filter(p => malefics.includes(p.name));
+        const maleficCount = maleficPlanets.length;
+
         score -= maleficCount;
+        if (maleficCount > 0) {
+            reasoningParts.push(`Challenges indicated by harsh planets in 7th House (${maleficPlanets.map(p => p.name).join(", ")})`);
+        }
     }
 
     // Lord of 7th in Kendra/Trikona (+1.5)
@@ -223,6 +263,7 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
     )?.house;
     if (seventhLordHouse && ([1, 4, 7, 10, 5, 9] as number[]).includes(seventhLordHouse)) {
         score += 1.5;
+        reasoningParts.push("Lord of Relationships is securely placed, favoring commitment");
     }
 
     // Venus strength
@@ -230,14 +271,17 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
     if (venusHouseObj) {
         if (["Taurus", "Libra", "Pisces"].includes(venusHouseObj.sign)) {
             score += 2; // Exalted/own
+            reasoningParts.push("Venus is strong, enhancing romance and charm");
         }
         if (venusHouseObj.sign === "Virgo") {
             score -= 1.5; // Debilitated
+            reasoningParts.push("Venus is debilitated in Virgo, suggesting need for practicality in love");
         }
         // Venus + Mars conjunction (+1)
         const marsHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Mars"))?.house;
         if (marsHouse === venusHouseObj.house) {
             score += 1;
+            reasoningParts.push("Venus-Mars conjunction adds passion");
         }
     }
 
@@ -245,11 +289,16 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
     const jupiterHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Jupiter"))?.house;
     if (jupiterHouse && [7, 11, 1, 3].includes(jupiterHouse)) {
         score += 1;
+        reasoningParts.push("Jupiter aspects the House of Marriage, offering protection");
+    }
+
+    if (reasoningParts.length === 0) {
+        reasoningParts.push("Standard relationship prospects; depends on dasha cycles");
     }
 
     return {
         score: Math.min(10, Math.round(score * 2) / 2),
-        reasoning: "Love score based on 7th house, Venus dignity, and relationship indicators.",
+        reasoning: reasoningParts.join(". ") + ".",
         keyFindings: []
     };
 }
@@ -258,14 +307,17 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
 // 🌀 Manifestation Scoring
 // =============================================================================
 
-// OPTIMIZATION: Inject verified YogaResult to avoid re-calculation
 export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEvaluationResult): ManifestationEvaluationResult {
     let score = 2; // Base
+    let reasoningParts: string[] = [];
 
     // 11th house planets (+1 each)
     const eleventhHouse = chartData.houses.find(h => h.house === 11);
     if (eleventhHouse) {
         score += eleventhHouse.planets.length;
+        if (eleventhHouse.planets.length > 0) {
+            reasoningParts.push(`Active 11th House (${eleventhHouse.planets.map(p => p.name).join(", ")}) signifies gains and networking`);
+        }
     }
 
     // Lord of 11th strong (+2)
@@ -277,7 +329,6 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
     if (eleventhLordHouse) {
         const sign = eleventhLordHouse.sign;
         const planet = eleventhLord;
-        // Check if planet is exalted/own in that sign
         const exaltedOwn: Record<string, string[]> = {
             "Sun": ["Leo", "Aries"],
             "Moon": ["Cancer", "Taurus"],
@@ -289,6 +340,7 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
         };
         if (exaltedOwn[planet]?.includes(sign)) {
             score += 2;
+            reasoningParts.push(`Lord of Gains (${eleventhLord}) is strong in ${sign}, amplifying results`);
         }
     }
 
@@ -300,6 +352,9 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
             .filter(p => malefics.includes(p.name))
             .length;
         score += maleficCount * 1.5;
+        if (maleficCount > 0) {
+            reasoningParts.push("Malefics in 3rd House boost courage and self-effort");
+        }
     }
 
     // Lord of 3rd strong (+1)
@@ -322,6 +377,7 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
         };
         if (exaltedOwn[planet as keyof typeof exaltedOwn]?.includes(sign)) {
             score += 1;
+            reasoningParts.push("Lord of Effort is strong, supporting initiative");
         }
     }
 
@@ -330,54 +386,105 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
     if (marsHouseObj) {
         if (["Aries", "Scorpio", "Capricorn"].includes(marsHouseObj.sign)) {
             score += 2;
+            reasoningParts.push("Strong Mars indicates exceptional willpower");
         }
     }
 
-    // Chart Power Bonus: +1 if any Tier 1/2 yoga
-    // OPTIMIZATION: Used injected yogaResult
+    // Manifestation Bonuses from Mystical Yogas
+    const mysticalYogas = yogaResult.yogasIdentified.filter(y => y.includes("(Manifestation)"));
+    for (const yoga of mysticalYogas) {
+        if (yoga.includes("Shakti")) {
+            const marsSign = getPlanetSign("Mars", chartData);
+            if (marsSign && ["Aries", "Scorpio", "Capricorn"].includes(marsSign)) {
+                score += 2; // Mars strong
+                reasoningParts.push("Shakti Yoga (with exalted Mars) maximizes manifesting power");
+            } else {
+                score += 1.5;
+                reasoningParts.push("Shakti Yoga present, granting energy for achievement");
+            }
+        }
+        if (yoga.includes("Saraswati")) {
+            score += isPlanetAfflicted("Mercury", chartData) ? 1 : 1.5;
+            reasoningParts.push("Saraswati Yoga adds intellectual and creative power to manifestation");
+        }
+    }
+
+    // Chart Power Bonus: +1 if any Tier 1/2 yoga (including general)
     if (yogaResult.yogaCount > 0) {
         score += 1;
+        // This is a general bonus, we can append it or leave it implicit in the high score.
+        // Let's add it for clarity.
+        reasoningParts.push(`General chart strength (+${yogaResult.yogaCount} Yogas) reinforces success`);
+    }
+
+    if (reasoningParts.length === 0) {
+        reasoningParts.push("Manifestation relies on steady, consistent work rather than bursts of power");
     }
 
     return {
         score: Math.min(10, Math.round(score * 2) / 2),
-        reasoning: "Manifestation score based on 11th/3rd houses, Mars strength, and chart power.",
-        keyFindings: []
+        reasoning: reasoningParts.join(". ") + ".",
+        keyFindings: mysticalYogas
     };
 }
 
 // =============================================================================
-// 🌌 Spiritual Scoring (Simplified Example)
+// 🌌 Supernatural Scoring (Replaces "Spiritual")
 // =============================================================================
 
-export function evaluateSpiritual(chartData: ChartData): SpiritualEvaluationResult {
-    let score = 5; // Base
+export function evaluateSupernatural(
+    chartData: ChartData,
+    yogaResult: YogaEvaluationResult
+): SupernaturalEvaluationResult {
+    let score = 2; // Base: average intuition
+    let reasoningParts: string[] = [];
 
     // Ketu in 4th, 8th, or 12th (Moksha Houses) (+2)
-    const ketuHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Ketu"))?.house;
+    const ketuHouse = getPlanetHouse("Ketu", chartData);
     if (ketuHouse && [4, 8, 12].includes(ketuHouse)) {
         score += 2;
+        reasoningParts.push(`Ketu in Moksha House (${ketuHouse}) opens door to liberation`);
     }
 
-    // Jupiter + Ketu conjunction (+1.5)
-    if (ketuHouse !== undefined) {
-        const jupiterHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Jupiter"))?.house;
-        if (jupiterHouse === ketuHouse) {
-            score += 1.5;
+    // Bonus for Mystical Yogas
+    const mysticalYogas = yogaResult.yogasIdentified.filter(y => y.includes("(Mystical)"));
+
+    for (const yoga of mysticalYogas) {
+        if (yoga.includes("Guru-Ketu")) {
+            // Check house again for bonus points
+            const ketuHouse = getPlanetHouse("Ketu", chartData);
+            if (ketuHouse && [8, 12].includes(ketuHouse)) {
+                score += isPlanetAfflicted("Jupiter", chartData) ? 1.5 : 2;
+                reasoningParts.push("Guru-Ketu Yoga in Moksha house indicates profound spiritual wisdom");
+            } else {
+                score += 1;
+                reasoningParts.push("Guru-Ketu Yoga detected");
+            }
+        }
+        if (yoga.includes("Chandra-Node")) {
+            const moonSign = getPlanetSign("Moon", chartData);
+            if (moonSign && ["Cancer", "Scorpio", "Pisces"].includes(moonSign)) {
+                score += 2; // water sign amplifies
+                reasoningParts.push("Chandra-Node Yoga in Water sign heightens psychic sensitivity");
+            } else {
+                score += 1.5;
+                reasoningParts.push("Chandra-Node Yoga suggests intuitive nature");
+            }
+        }
+        if (yoga.includes("Kala Sarpa")) {
+            score += isPlanetAfflicted("Moon", chartData) ? 1 : 1.5;
+            reasoningParts.push("Kala Sarpa Yoga (Spiritual) creates intense life path focused on destiny");
         }
     }
 
-    // Moon + Mercury in 12th (+1)
-    const moonHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Moon"))?.house;
-    const mercuryHouse = chartData.houses.find(h => h.planets.some(p => p.name === "Mercury"))?.house;
-    if (moonHouse === 12 && mercuryHouse === 12) {
-        score += 1;
+    if (reasoningParts.length === 0) {
+        reasoningParts.push("Latent potential for intuition; no major mystical yogas active");
     }
 
     return {
         score: Math.min(10, Math.round(score * 2) / 2),
-        reasoning: "Spiritual score based on Ketu, Jupiter, and 12th house placements.",
-        keyFindings: []
+        reasoning: reasoningParts.join(". ") + ".",
+        keyFindings: mysticalYogas
     };
 }
 
@@ -390,7 +497,7 @@ export interface CouncilFindings {
     career: CareerEvaluationResult;
     manifestation: ManifestationEvaluationResult;
     love: LoveEvaluationResult;
-    spiritual: SpiritualEvaluationResult;
+    supernatural: SupernaturalEvaluationResult;
 }
 
 export function calculateAllScores(chartData: ChartData): CouncilFindings {
@@ -399,8 +506,8 @@ export function calculateAllScores(chartData: ChartData): CouncilFindings {
     return {
         auspiciousness: findings,
         career: evaluateCareer(chartData),
-        manifestation: evaluateManifestation(chartData, findings), // Injected dependency
+        manifestation: evaluateManifestation(chartData, findings),
         love: evaluateLove(chartData),
-        spiritual: evaluateSpiritual(chartData)
+        supernatural: evaluateSupernatural(chartData, findings)
     };
 }

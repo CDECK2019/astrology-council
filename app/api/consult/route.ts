@@ -54,9 +54,9 @@ export async function POST(req: Request) {
                 content: `**Score: ${councilReport.love.score}/10**\n\n**Analysis:**\n${councilReport.love.reasoning}`
             },
             {
-                modelId: "spiritual-evaluator",
-                role: "Spirituality & Moksha",
-                content: `**Score: ${councilReport.spiritual.score}/10**\n\n**Analysis:**\n${councilReport.spiritual.reasoning}`
+                modelId: "spiritual-evaluator", // Keeping ID stable for FE compatibility
+                role: "Supernatural Abilities",
+                content: `**Score: ${councilReport.supernatural.score}/10**\n\n**Yogas:**\n${councilReport.supernatural.keyFindings.join(', ') || "None"}\n\n**Analysis:**\n${councilReport.supernatural.reasoning}`
             },
         ];
 
