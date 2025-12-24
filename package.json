@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleDirectories": [
+      "node_modules",
+      "lib"
+    ]
   },
   "dependencies": {
     "clsx": "latest",
@@ -19,14 +28,18 @@
     "tailwind-merge": "latest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "autoprefixer": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "jest": "^30.2.0",
     "postcss": "latest",
     "tailwindcss": "latest",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
     "typescript": "latest"
   }
 }

@@ -26,6 +26,11 @@ export interface YogaEvaluationResult extends EvaluationResult {
     yogasIdentified: string[];
 }
 
+export interface CareerEvaluationResult extends EvaluationResult { }
+export interface LoveEvaluationResult extends EvaluationResult { }
+export interface ManifestationEvaluationResult extends EvaluationResult { }
+export interface SpiritualEvaluationResult extends EvaluationResult { }
+
 export interface CouncilReport {
     auspiciousness: YogaEvaluationResult;
     career: EvaluationResult;
