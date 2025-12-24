@@ -6,9 +6,15 @@ import { evaluateManifestation } from "./modules/manifestation-evaluator";
 import { evaluateLove } from "./modules/love-evaluator";
 import { evaluateSpiritual } from "./modules/spiritual-evaluator";
 
+import { normalizeChartData } from "./chart-normalizer";
+
 const MASTER_MODEL = "nvidia/llama-3.1-nemotron-70b-instruct";
 
-export async function orchestrateCouncil(chartData: ChartData): Promise<CouncilReport> {
+export async function orchestrateCouncil(rawChartData: any): Promise<CouncilReport> {
+
+    // 0. Normalize Data (Crucial Step!)
+    // The input might be raw API JSON. We convert it to strict specific ChartData.
+    const chartData = normalizeChartData(rawChartData);
 
     // 1. Parallel Evaluation
     console.log("[Orchestrator] Starting Council Deliberation (Parallel Evaluators)...");

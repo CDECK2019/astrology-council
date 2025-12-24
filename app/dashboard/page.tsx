@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { EtherealBackground } from "@/components/EtherealBackground";
 import { motion } from "framer-motion";
-import { COUNCIL_MEMBERS } from "@/lib/llm";
+import { COUNCIL_MEMBERS } from "@/lib/types";
 import { User, Volume2, AlertCircle, ArrowLeft, Star } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";

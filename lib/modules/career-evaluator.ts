@@ -1,7 +1,7 @@
 
 import { ChartData, EvaluationResult } from "../types";
 
-const CAREER_MODEL = "x-ai/grok-beta"; // The Executive (Real World Edge)
+const CAREER_MODEL = "openai/gpt-4o"; // The Executive (Gold Standard)
 const MANIFESTATION_MODEL = "openai/gpt-4o-mini"; // The Architect (Builder)
 
 export async function evaluateCareer(chartData: ChartData): Promise<EvaluationResult> {
@@ -43,18 +43,21 @@ export async function evaluateCareer(chartData: ChartData): Promise<EvaluationRe
             body: JSON.stringify({
                 model: CAREER_MODEL,
                 messages: [
-                    { role: "system", content: systemPrompt },
+                    { role: "system", content: systemPrompt + "\n\nCRITICAL: RETURN RAW JSON ONLY. NO MARKDOWN BACKTICKS." },
                     { role: "user", content: `Analyze this chart for CAREER: ${formattedData}` }
                 ],
-                response_format: { type: "json_object" }
+                // response_format: { type: "json_object" } 
             })
         });
 
         const data = await response.json();
-        const result = JSON.parse(data.choices[0].message.content);
-        return result;
+        let content = data.choices[0].message.content;
+        content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+        return JSON.parse(content);
 
-    } catch (e) {
+    } catch (e: any) {
+        console.error("❌ Career Evaluator Failed:", e.message);
+        console.error("Raw Error:", e);
         return { score: 5, reasoning: "Evaluation failed.", keyFindings: [] };
     }
 }

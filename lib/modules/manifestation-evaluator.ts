@@ -15,8 +15,15 @@ export async function evaluateManifestation(chartData: ChartData): Promise<Evalu
     2. 3rd House (Sahaja Bhava) - Courage and self-effort.
     3. Evaluation of specific Yogas like Shakti Yoga or Vasumati Yoga.
     
+    ** ASTROLOGICAL RULES - TERMINOLOGY **
+    - **Benefics**: Venus, Jupiter, Mercury (unafflicted), Moon (bright).
+    - **Malefics**: Sun, Mars, Saturn, Rahu, Ketu.
+    - **CRITICAL**: Malefics (Sun/Mars/Saturn) in 3rd and 11th (Upachaya Houses) are **EXCELLENT** for gains and willpower.
+      - *Correct Phrasing*: "The 11th house has the strong Sun, offering immense gains..."
+      - *Incorrect Phrasing*: "The 11th house has the benefic Sun..." (SUN IS NOT A BENEFIC).
+    
     ** SCORING CRITERIA (1-10) **
-    - 9-10: Strong 11th House (Benefics/Lords strong), Exalted 3rd Lord.
+    - 9-10: Strong 11th House (Benefics OR Strong Malefics present), Exalted 3rd Lord.
     - 7-8: Good gains potential, decent willpower.
     - 4-6: Average.
     - 1-3: Weak 11th/3rd houses (Debilitated lords).

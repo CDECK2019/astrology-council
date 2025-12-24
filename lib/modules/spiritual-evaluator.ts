@@ -1,7 +1,7 @@
 
 import { ChartData, EvaluationResult } from "../types";
 
-const SPIRITUAL_MODEL = "meta-llama/llama-3.1-405b-instruct"; // The Sage (Mystic)
+const SPIRITUAL_MODEL = "meta-llama/llama-3.1-70b-instruct"; // The Mystic (Reliable)
 
 export async function evaluateSpiritual(chartData: ChartData): Promise<EvaluationResult> {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -42,16 +42,17 @@ export async function evaluateSpiritual(chartData: ChartData): Promise<Evaluatio
             body: JSON.stringify({
                 model: SPIRITUAL_MODEL,
                 messages: [
-                    { role: "system", content: systemPrompt },
+                    { role: "system", content: systemPrompt + "\n\nCRITICAL: RETURN RAW JSON ONLY. NO MARKDOWN BACKTICKS." },
                     { role: "user", content: `Analyze this chart for SPIRITUALITY: ${formattedData}` }
                 ],
-                response_format: { type: "json_object" }
+                // response_format: { type: "json_object" } 
             })
         });
 
         const data = await response.json();
-        const result = JSON.parse(data.choices[0].message.content);
-        return result;
+        let content = data.choices[0].message.content;
+        content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+        return JSON.parse(content);
 
     } catch (e) {
         return { score: 5, reasoning: "Evaluation failed.", keyFindings: [] };
