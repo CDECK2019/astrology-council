@@ -1,42 +1,73 @@
+
 import { NextResponse } from "next/server";
-import { getCouncilReviews, getMasterSynthesis, getPeerRankings } from "@/lib/llm";
+import { orchestrateCouncil } from "@/lib/orchestrator";
+
+export const maxDuration = 300; // 5 minutes timeout
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         console.log("[API] /api/consult received body:", JSON.stringify(body, null, 2));
-        const { name, chartData } = body;
 
-        if (!chartData || !chartData.houses) {
-            console.error("[API] ❌ Invalid chartData received:", chartData);
+        // Note: The frontend sends { name: "...", chartData: { ... } }
+        // BUT the old code destructured `const { name, chartData } = body`.
+        // However, if the user sends `birthChartData` (as per my previous attempt's assumption), we should check.
+        // Looking at the view_file output, the old code used: `const { name, chartData } = body;`
+        // So we will stick to that.
+
+        const { name, chartData, birthChartData } = body;
+        const dataToProcess = chartData || birthChartData;
+
+        if (!dataToProcess || !dataToProcess.houses) {
+            console.error("[API] ❌ Invalid chartData received:", dataToProcess);
             return NextResponse.json({ error: "Invalid chart data" }, { status: 400 });
         }
 
-        // Note: We use the chartData directly as it's passed to getCouncilReviews which handles formatting
-        // No local formatChartForLLM needed here as logic is moved to lib/llm.ts
+        // Run the new Orchestrator Pipeline
+        console.log("[API] calling orchestrateCouncil...");
+        const councilReport = await orchestrateCouncil(dataToProcess);
+        console.log("[API] orchestrateCouncil complete.");
 
-        // Stage 1: Council Reviews
-        console.log("Fetching council reviews...");
-        const reviews = await getCouncilReviews(chartData);
-        console.log("Council reviews received.");
+        // ADAPTER LAYER:
+        // The frontend expects: { reviews: Array, peerReviews: Array, synthesis: String }
+        // We must map our new `councilReport` structure to this to keep the UI working without a frontend refactor.
 
-        // Stage 2: Peer Review
-        console.log("Fetching peer reviews...");
-        const peerReviews = await getPeerRankings(reviews);
-        console.log("Peer reviews received.");
-
-        // Stage 3: Master Synthesis
-        console.log("Fetching master synthesis...");
-        const synthesis = await getMasterSynthesis(reviews, peerReviews);
-        console.log("Master synthesis received.");
+        const adaptedReviews = [
+            {
+                modelId: "yoga-evaluator",
+                role: "Auspiciousness & Yogas",
+                content: `**Score: ${councilReport.auspiciousness.score}/10**\n\n**Yogas Found:**\n${councilReport.auspiciousness.yogasIdentified.join(', ') || "None"}\n\n**Analysis:**\n${councilReport.auspiciousness.reasoning}`
+            },
+            {
+                modelId: "career-evaluator",
+                role: "Career & Status",
+                content: `**Score: ${councilReport.career.score}/10**\n\n**Analysis:**\n${councilReport.career.reasoning}`
+            },
+            {
+                modelId: "manifestation-evaluator",
+                role: "Manifestation & Gains",
+                content: `**Score: ${councilReport.manifestation.score}/10**\n\n**Analysis:**\n${councilReport.manifestation.reasoning}`
+            },
+            {
+                modelId: "love-evaluator",
+                role: "Love & Relationships",
+                content: `**Score: ${councilReport.love.score}/10**\n\n**Analysis:**\n${councilReport.love.reasoning}`
+            },
+            {
+                modelId: "spiritual-evaluator",
+                role: "Spirituality & Moksha",
+                content: `**Score: ${councilReport.spiritual.score}/10**\n\n**Analysis:**\n${councilReport.spiritual.reasoning}`
+            },
+        ];
 
         return NextResponse.json({
-            chartData,
-            reviews,
-            peerReviews,
-            synthesis,
+            chartData: dataToProcess,
+            reviews: adaptedReviews,
+            peerReviews: [], // No longer needed
+            synthesis: councilReport.synthesis,
             userName: name
         });
+
     } catch (error: any) {
         console.error("Consultation API error detail:", error);
         return NextResponse.json(
@@ -44,45 +75,4 @@ export async function POST(req: Request) {
             { status: 500 }
         );
     }
-}
-
-// Format manual chart data into a clear text format for LLM consumption
-function formatChartForLLM(chartData: any): string {
-    const { ascendantSign, houses } = chartData;
-
-    let chartText = `VEDIC BIRTH CHART ANALYSIS\n`;
-    chartText += `========================\n\n`;
-    chartText += `Ascendant(Lagna): ${ascendantSign} \n\n`;
-    chartText += `HOUSE PLACEMENTS: \n`;
-    chartText += `-----------------\n`;
-
-    houses.forEach((house: any) => {
-        const planetsStr = house.planets.length > 0
-            ? house.planets.map((p: any) => `${p.name}${p.isRetro ? ' (R)' : ''} `).join(', ')
-            : 'Empty';
-
-        chartText += `House ${house.house} (${house.sign}): ${planetsStr} \n`;
-    });
-
-    // Add summary of planet positions
-    chartText += `\nPLANET SUMMARY: \n`;
-    chartText += `---------------\n`;
-
-    const allPlanets: { name: string; house: number; sign: string; isRetro: boolean }[] = [];
-    houses.forEach((house: any) => {
-        house.planets.forEach((planet: any) => {
-            allPlanets.push({
-                name: planet.name,
-                house: house.house,
-                sign: house.sign,
-                isRetro: planet.isRetro
-            });
-        });
-    });
-
-    allPlanets.forEach(p => {
-        chartText += `${p.name}: House ${p.house} in ${p.sign}${p.isRetro ? ' (Retrograde)' : ''} \n`;
-    });
-
-    return chartText;
 }

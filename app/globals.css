@@ -3,23 +3,27 @@
 @tailwind utilities;
 
 :root {
-  /* Core palette */
+  /* Core palette - Darker, richer base */
   --cosmic-dark: #020617;
-  --cosmic-deep: #0f0d1a;
-  --cosmic-mid: #1e1b4b;
+  --cosmic-deep: #0a1412;
+  --cosmic-mid: #0d2924;
 
-  /* Accent colors */
+  /* Accent colors - Green tint */
   --accent-gold: #d4af37;
   --accent-rose: #f472b6;
-  --accent-indigo: #818cf8;
-  --accent-violet: #a78bfa;
+  --accent-emerald: #34d399;
+  --accent-teal: #2dd4bf;
+  --accent-jade: #10b981;
+  /* Keep legacy names pointing to green for compatibility */
+  --accent-indigo: #34d399;
+  --accent-violet: #2dd4bf;
   --accent-cyan: #22d3ee;
 
-  /* Glass variables */
-  --glass-bg: rgba(15, 13, 26, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 16px;
-  --glass-highlight: rgba(255, 255, 255, 0.05);
+  /* Glass variables - Enhanced translucency */
+  --glass-bg: rgba(10, 20, 18, 0.65);
+  --glass-border: rgba(52, 211, 153, 0.12);
+  --glass-blur: 20px;
+  --glass-highlight: rgba(52, 211, 153, 0.08);
 }
 
 /* Base styles */
@@ -41,21 +45,22 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--accent-indigo), var(--accent-violet));
+  background: linear-gradient(180deg, var(--accent-emerald), var(--accent-teal));
   border-radius: 4px;
 }
 
 @layer components {
 
-  /* Premium glassmorphism card */
+  /* Premium glassmorphism card - Enhanced */
   .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
     border: 1px solid var(--glass-border);
     border-radius: 1.5rem;
     box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 60px rgba(16, 185, 129, 0.05),
       inset 0 1px 0 var(--glass-highlight);
   }
 
@@ -69,12 +74,12 @@ body {
     position: absolute;
     inset: -3px;
     background: linear-gradient(135deg,
-        var(--accent-indigo),
-        var(--accent-violet),
+        var(--accent-emerald),
+        var(--accent-teal),
         var(--accent-gold),
-        var(--accent-rose));
+        var(--accent-jade));
     filter: blur(24px);
-    opacity: 0.2;
+    opacity: 0.15;
     z-index: -1;
     border-radius: inherit;
     animation: pulse-glow 4s ease-in-out infinite;
@@ -82,7 +87,7 @@ body {
 
   /* Gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, var(--accent-indigo), var(--accent-violet), var(--accent-gold));
+    background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal), var(--accent-gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

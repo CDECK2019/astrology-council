@@ -40,7 +40,7 @@ const SCORING_CRITERIA = `
 3. Love (Relationships and emotional fulfillment)
 4. Supernatural abilities/capabilities (Intuition, spiritual depth, psychic potential)
 5. Manifestation capability (Ability to bring desires into reality)
-6. Presence of Mahapurusha Yogas (Technical Check: Sasa, Ruchaka, Bhadra, Hamsa, Malavya)
+6. Mahapurusha Yoga Count (Integer 0-5)
 `;
 
 function formatChartDataForLLM(chartData: any): string {
@@ -87,36 +87,59 @@ export async function getCouncilReviews(chartData: any) {
         COUNCIL_MEMBERS.map(async (member) => {
             console.log(`[LLM] Calling OpenRouter for ${member.name} using model: ${member.id}`);
 
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
-                    'HTTP-Referer': 'https://astrologycouncil.app',
-                    'X-Title': 'The Astrology Council',
-                },
-                body: JSON.stringify({
-                    model: member.id,
-                    messages: [
-                        {
-                            role: 'system',
-                            content: `You are ${member.name}, an expert in ${member.role}. Focus on: ${member.specialty}.
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': 'https://astrologycouncil.app',
+                        'X-Title': 'The Astrology Council',
+                    },
+                    body: JSON.stringify({
+                        model: member.id,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are ${member.name}, an expert in ${member.role}. Focus on: ${member.specialty}.
+
+** REFERENCE TABLE: PLANETARY DIGNITIES (ABSOLUTE TRUTH) **
+Use this table to VALIDATE all Yoga claims. Do NOT deviate.
+| Planet  | Own Sign(s)          | Exalted Sign    |
+|---------|----------------------|-----------------|
+| Mars    | Aries, Scorpio       | Capricorn       |
+| Mercury | Gemini, Virgo        | Virgo           |
+| Jupiter | Sagittarius, Pisces  | Cancer          |
+| Venus   | Taurus, Libra        | Pisces          |
+| Saturn  | Capricorn, Aquarius  | Libra           |
+| Sun     | Leo                  | Aries           |
+| Moon    | Cancer               | Taurus          |
 
 ** KNOWLEDGE CONTEXT: MAHAPURUSHA YOGAS **
-                        You must strictly check for these 5 specific Yogas.A Yoga is present if the planet is ** Exalted ** OR in its ** Own Sign ** AND placed in a ** Kendra(Angular) House ** (1, 4, 7, 10).
+You must strictly check for these 5 specific Yogas. A Yoga is present if and only if:
+1. The Planet is in a **Kendra (Angular) House** (1, 4, 7, 10).
+2. AND The Planet is in its **Own** or **Exalted** Sign (See Table above).
 
-1. ** Ruchaka Yoga ** (Mars):
+** WARNING: COMMON HALLUCINATIONS **
+- Saturn in Gemini/Virgo is NOT Sasa Yoga (Friendly, but not Own/Exalted).
+- Mars in Leo is NOT Ruchaka Yoga.
+- Jupiter in Leo/Scorpio is NOT Hamsa Yoga.
+- Moon in Kendra is NOT Mahapurusha Yoga (e.g., Malavya is VENUS only).
+
+1. ** Ruchaka Yoga ** (Mars ONLY):
                     - Signs: Aries(Own), Scorpio(Own), Capricorn(Exalted).
    - Must be in House 1, 4, 7, or 10.
-2. ** Bhadra Yoga ** (Mercury):
+   - **CRITICAL**: SUN in Aries is NOT Ruchaka Yoga. Sun is Exalted but NOT Mahapurusha.
+2. ** Bhadra Yoga ** (Mercury ONLY):
                     - Signs: Gemini(Own), Virgo(Own / Exalted).
    - Must be in House 1, 4, 7, or 10.
-3. ** Hamsa Yoga ** (Jupiter):
+3. ** Hamsa Yoga ** (Jupiter ONLY):
                     - Signs: Sagittarius(Own), Pisces(Own), Cancer(Exalted).
    - Must be in House 1, 4, 7, or 10.
-4. ** Malavya Yoga ** (Venus):
+4. ** Malavya Yoga ** (Venus ONLY):
                     - Signs: Taurus(Own), Libra(Own), Pisces(Exalted).
    - Must be in House 1, 4, 7, or 10.
+   - **CRITICAL**: MOON does not form this Yoga (or any Mahapurusha Yoga).
 5. ** Sasa Yoga ** (Saturn):
                     - Signs: Capricorn(Own), Aquarius(Own), Libra(Exalted).
    - Must be in House 1, 4, 7, or 10.
@@ -214,9 +237,10 @@ Score "Ability to bring desires into reality" based on Willpower (3rd) and Gains
 
 YOUR TASK:
                     1. Review the provided Vedic Rasi chart data.
-2. ** CRITICAL FIRST STEP **: Perform a strict technical check for ** Mahapurusha Yogas** (Planets Exalted or in Own Sign in Kendra / Angular houses 1, 4, 7, 10).
-   - If found, you MUST explicitly name them (e.g., "Sasa Yoga present due to Saturn Exalted in 1st House").
-   - If not found, explicitly state "No Mahapurusha Yogas".
+1. ** LIST KENDRA PLANETS **: First, list every planet in Houses 1, 4, 7, 10.
+2. ** VERIFY DIGNITY **: For each Kendra planet, check the Reference Table. Is it in Own or Exalted Sign?
+   - If YES -> Declare the Mahapurusha Yoga.
+   - If NO -> Explicitly state "No [Yoga Name]".
 3. ** SECONDARY CHECK **: Identify any **Wealth, Power, Manifestation, or Supernatural Yogas** defined in the context (Lakshmi, Shakti, etc.).
    - Explicitly name them if the criteria are met.
 3. Provide a brief narrative summary highlighting the most important placements.
@@ -226,32 +250,57 @@ ${SCORING_CRITERIA}
             IMPORTANT: Do NOT use markdown tables.Use bullet points, numbered lists, or clear prose paragraphs for all output.Tables are difficult for humans to read.
 
 Be concise, wise, and profound.`,
-                        },
-                        {
-                            role: 'user',
-                            content: `Vedic Birth Chart Data: \n${formatChartDataForLLM(chartData)} `,
-                        },
+                            },
+                            {
+                                role: 'user',
+                                content: `Vedic Birth Chart Data: \n${formatChartDataForLLM(chartData)} `,
+                            },
 
-                    ],
-                }),
-            });
+                        ],
+                    }),
+                });
 
-            console.log(`[LLM] ${member.name} response status: `, response.status, response.statusText);
+                console.log(`[LLM] ${member.name} response status: `, response.status, response.statusText);
 
-            const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
 
-            if (data.error) {
-                console.error(`[LLM] ❌ ${member.name} error: `, data.error);
-                throw new Error(data.error.message);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error(`[LLM] ❌ ${member.name} error: `, data.error);
+                    throw new Error(data.error.message);
+                }
+
+                const content = data.choices?.[0]?.message?.content;
+
+                if (!content || content.trim().length === 0) {
+                    console.warn(`[LLM] ⚠️ ${member.name} returned empty content.`);
+                    return {
+                        modelId: member.id,
+                        role: member.role,
+                        content: `${member.name} is currently in deep meditation and could not provide a verbal response. (Review Unavailable)`,
+                    };
+                }
+
+                console.log(`[LLM] ✅ ${member.name} responded successfully`);
+
+                return {
+                    modelId: member.id,
+                    role: member.role,
+                    content: content,
+                };
+
+            } catch (error: any) {
+                console.error(`[LLM] 💥 Exception calling ${member.name}:`, error.message);
+                // Return a graceful error placeholder so Promise.all doesn't fail globally
+                return {
+                    modelId: member.id,
+                    role: member.role,
+                    content: `${member.name} encountered a cosmic disturbance and could not complete the analysis. (Error: ${error.message})`,
+                };
             }
-
-            console.log(`[LLM] ✅ ${member.name} responded successfully`);
-
-            return {
-                modelId: member.id,
-                role: member.role,
-                content: data.choices[0].message.content,
-            };
         })
     );
 
@@ -289,8 +338,12 @@ Below are anonymized responses from other Council Members regarding a native's c
 YOUR TASK:
     1. Review each response critically.
 2. For EACH response, answer: "Is this output >85% factually true based on Vedic principles?"(Yes / No and brief reason).
-3. Provide a FINAL RANKING of the responses from Best to Worst based on accuracy, depth, and adherence to your specialty(${member.role
-                }).
+3. Provide a FINAL RANKING of the responses from Best to Worst based on accuracy, depth, and adherence to your specialty(${member.role}).
+
+** VERIFICATION STEP **:
+Before ranking, CROSS-REFERENCE every Yoga claim with the Planetary Dignities Table.
+- If a response claims "Saturn in Gemini is Sasa Yoga", check the table. Is Gemini Own/Exalted for Saturn? NO. -> Mark as Factual Error.
+- If a response misses a clear Yoga (e.g., Jupiter in Pisces in Kendra), mark as Factual Error.
 
         FORMAT:
     - Use clear headings for each response critique.
@@ -355,15 +408,20 @@ Three Council Members have provided their analysis of a birth chart.
 
 YOUR TASK:
     1. Synthesize the initial findings into a final, authoritative "Master Decree".
-2. **HANDLING DISCREPANCIES**: 
-   - If *ANY* Council Member identifies a Mahapurusha Yoga or Major Yoga, checks out the data yourself. If plausible, INCLUDE IT.
-   - If consensus is split, side with the member who identified specific Yogas over those who found "nothing".
+2. **HANDLING DISCREPANCIES & VERIFICATION**: 
+   - **MANDATORY CHECK**: If a Member identifies a Yoga, you MUST verifying it against the **Planetary Dignities Table** (Internal Knowledge).
+   - **Example**: Member says "Sasa Yoga (Saturn in Gemini)". You check: Saturn Own=Cap/Aqu, Exalted=Lib. Gemini is NOT matching. -> REJECT IT.
+   - **Example**: Member says "Hamsa Yoga (Jupiter in Pisces)". You check: Jupiter Own=Sag/Pis. Match! -> ACCEPT IT.
+   - If consensus is split, side with the **Technically Correct** analysis based on this check, not just the majority.
 3. **SCORING**:
-   - Scores must follow the "Magnitude > Quantity" philosophy. 
-   - A single Mahapurusha Yoga automatically justifies an Auspiciousness score of 8/10 or higher.
-   - Do not dilute the score just because *other* yogas are missing.
+   - **CRITICAL SCORING RULE**: If verified **Mahapurusha Yoga Count >= 1**, you **MUST** award an **Auspiciousness Score of 8/10 or higher**.
+   - **ABSOLUTELY FORBIDDEN**: Do NOT output 7/10 or lower if a Mahapurusha Yoga is present.
+   - **Do NOT** "adjust" or "average down" for missing yogas. A Mahapurusha Yoga is a TRUMP CARD.
+   - **Example**: Bhadra Yoga verifying = Score 8/10 (Minimum).
+   - **Failure to follow this rule is a failure of analysis.**
    - Mention the consensus of the council (e.g., "The Council unanimously agrees...", "Despite some debate regarding...").
 4. Present the final unified scores in a clean numbered list format.
+   - **CRITICAL**: For 'Mahapurusha Yoga Count', output ONLY the integer count (e.g., "2" or "2/5"). Do NOT add bonus points here. This is a technical checksum.
 5. Speak directly to the native with eloquence and deep spiritual insight.
 
         IMPORTANT: Do NOT use markdown tables.Use bullet points or lists.`

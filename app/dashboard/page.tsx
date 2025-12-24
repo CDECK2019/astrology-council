@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { EtherealBackground } from "@/components/EtherealBackground";
-import { RasiChart } from "@/components/RasiChart";
-import { BirthChartTable } from "@/components/BirthChartTable";
 import { motion } from "framer-motion";
 import { COUNCIL_MEMBERS } from "@/lib/llm";
-import { User, Volume2, Sparkles, AlertCircle, ArrowLeft, Star } from "lucide-react";
+import { User, Volume2, AlertCircle, ArrowLeft, Star } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 
@@ -85,7 +83,6 @@ export default function Dashboard() {
                         <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-white font-cinzel tracking-tight">
                             Your <span className="text-gradient">Cosmic Blueprint</span>
                         </h1>
-                        <BirthChartTable chartData={data.chartData} />
                     </motion.div>
 
                     <motion.div
@@ -113,14 +110,14 @@ export default function Dashboard() {
                         transition={{ delay: 0.3 }}
                         className="glass-card p-8 sm:p-10 ethereal-glow relative overflow-hidden"
                     >
-                        <div className="absolute top-4 right-4 opacity-10">
-                            <Sparkles className="w-16 h-16 text-accent-gold" />
+                        <div className="absolute top-4 right-4 opacity-20 text-accent-gold text-4xl">
+                            ✦
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-indigo to-accent-violet flex items-center justify-center shadow-glow-sm">
-                                    <Sparkles className="text-white w-5 h-5" />
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-emerald to-accent-teal flex items-center justify-center shadow-glow-sm">
+                                    <span className="text-white text-lg">✦</span>
                                 </div>
                                 <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider font-cinzel">
                                     The Master <span className="text-gradient">Decree</span>
