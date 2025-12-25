@@ -103,21 +103,19 @@ describe("Mystical & Manifestation Yogas", () => {
     // 🧮 Supernatural Scoring
     // ============================================================================
 
-    test("Supernatural Score: Guru-Ketu in 12th (unafflicted) = +2", () => {
+    test("Supernatural Score: Guru-Ketu in 12th (unafflicted) = +4 (new)", () => {
         const chart = buildChart([
             { house: 12, sign: "Pisces", planets: ["Jupiter", "Ketu"] }
         ]);
         const yogaResult = evaluateYogas(chart);
         const result = evaluateSupernatural(chart, yogaResult);
-        // Base 2 + 2 (Ketu in 12th) + 2 (Guru-Ketu bonus, unafflicted in Pisces/12th) = 6
-        // Wait, let's trace evaluateSupernatural logic for Guru-Ketu:
-        // score = 2 (Base)
-        // Ketu in 12 -> +2 => 4
+        // Base 5 (Average)
+        // Ketu in 12 -> +2 => 7
         // Guru-Ketu Yoga found:
         //   Ketu in 12 -> isPlanetAfflicted("Jupiter")? Jupiter in Pisces is own sign -> Unafflicted.
-        //   Bonus += 2.
-        // Total = 6.
-        expect(result.score).toBe(6);
+        //   Bonus += 2 (New bonus).
+        // Total = 9.
+        expect(result.score).toBe(9);
     });
 
     test("Supernatural Score: Chandra-Rahu in Cancer (water sign) = +2", () => {
@@ -126,12 +124,12 @@ describe("Mystical & Manifestation Yogas", () => {
         ]);
         const yogaResult = evaluateYogas(chart);
         const result = evaluateSupernatural(chart, yogaResult);
-        // Base 2
-        // Ketu not in moksha house (assumed/not spec'd) -> +0
+        // Base 5 (Average)
+        // Ketu not in moksha house -> +0
         // Chandra-Node Yoga found:
         //   Moon in Cancer -> Water sign -> +2
-        // Total = 4.
-        expect(result.score).toBe(4);
+        // Total = 7.
+        expect(result.score).toBe(7);
     });
 
     test("Supernatural Score: Afflicted Moon reduces Kala Sarpa", () => {
@@ -142,14 +140,13 @@ describe("Mystical & Manifestation Yogas", () => {
         ]);
         const yogaResult = evaluateYogas(chart);
         const result = evaluateSupernatural(chart, yogaResult);
-        // Base 2
-        // Ketu in 12 -> +2
+        // Base 5
+        // Penalty: Afflicted Moon (Combust) -> -1.5 => 3.5
+        // Ketu in 12 -> +2 => 5.5
         // Kala Sarpa found:
-        //   Moon in Aries (with Sun -> Combust? Aries is friendly for Moon, but Sun makes it combust/New Moon).
-        //   isPlanetAfflicted("Moon") -> check combustion. Sun/Moon in same house -> True.
-        //   Bonus += 1.
-        // Total = 5.
-        expect(result.score).toBe(5);
+        //   Bonus += 1 (Afflicted Moon).
+        // Total = 6.5.
+        expect(result.score).toBe(6.5);
     });
 
     // ============================================================================

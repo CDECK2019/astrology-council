@@ -190,32 +190,42 @@ export function evaluateYogas(chartData: ChartData): YogaEvaluationResult {
 // =============================================================================
 
 export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
-    let score = 3; // Base
+    let score = 5; // Base: Average Career (Employment)
     let reasoningParts: string[] = [];
 
-    // 10th house planets (Sun, Mars, Saturn, Jupiter = +1 each)
+    // 10th house planets (Sun, Mars, Saturn, Jupiter = +0.5 each to avoid inflation)
     const tenthHouse = chartData.houses.find(h => h.house === 10);
     if (tenthHouse) {
         const strongPlanets = ["Sun", "Mars", "Saturn", "Jupiter"];
         const strongCount = tenthHouse.planets
             .filter(p => strongPlanets.includes(p.name))
             .length;
-        score += strongCount;
+        score += strongCount * 0.5; // Adjusted from +1 to +0.5 for Base 5
         if (strongCount > 0) {
             reasoningParts.push(`Presence of powerful planets (${tenthHouse.planets.map(p => p.name).join(", ")}) in the 10th House boosts authority`);
         }
     }
 
-    // Lord of 10th in Kendra/Trikona (+2)
-    const tenthLordSign = tenthHouse?.sign || "Aries"; // fallback
-
+    // Lord of 10th Logic
+    const tenthLordSign = tenthHouse?.sign || "Aries";
     const tenthLordHouse = chartData.houses.find(h =>
         h.planets.some(p => p.name === getPlanetForSign(tenthLordSign))
     )?.house;
 
-    if (tenthLordHouse && ([1, 4, 7, 10, 5, 9] as number[]).includes(tenthLordHouse)) {
-        score += 2;
-        reasoningParts.push(`The Lord of the 10th House is strongly placed in House ${tenthLordHouse}, ensuring professional stability`);
+    if (tenthLordHouse) {
+        if ([1, 4, 7, 10, 5, 9].includes(tenthLordHouse)) {
+            score += 1.5; // Reduced from +2
+            reasoningParts.push(`The Lord of the 10th House is strongly placed in House ${tenthLordHouse}, ensuring professional stability`);
+        } else if ([6, 8, 12].includes(tenthLordHouse)) {
+            score -= 1.5; // Penalty
+            reasoningParts.push(`Lord of 10th House in challenging placement (House ${tenthLordHouse}) suggests career obstacles`);
+        }
+    }
+
+    // Penalty: Afflicted Sun (Karaka for Career)
+    if (isPlanetAfflicted("Sun", chartData)) {
+        score -= 1;
+        reasoningParts.push("Afflicted Sun indicates challenges with authority or recognition");
     }
 
     // Amala Yoga: Benefic (Jup, Ven, Merc) in 10th (+2)
@@ -262,17 +272,17 @@ export function evaluateCareer(chartData: ChartData): CareerEvaluationResult {
 // =============================================================================
 
 export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
-    let score = 4; // Base
+    let score = 5; // Base: Average Relationships
     let reasoningParts: string[] = [];
 
-    // 7th house benefics (+1.5 each)
+    // 7th house benefics (+1 each, adjusted from 1.5)
     const seventhHouse = chartData.houses.find(h => h.house === 7);
     if (seventhHouse) {
         const benefics = ["Venus", "Jupiter", "Moon", "Mercury"];
         const beneficPlanets = seventhHouse.planets.filter(p => benefics.includes(p.name));
         const beneficCount = beneficPlanets.length;
 
-        score += beneficCount * 1.5;
+        score += beneficCount * 1.0;
         if (beneficCount > 0) {
             reasoningParts.push(`Benefics in 7th House (${beneficPlanets.map(p => p.name).join(", ")}) promote harmony`);
         }
@@ -282,21 +292,27 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
         const maleficPlanets = seventhHouse.planets.filter(p => malefics.includes(p.name));
         const maleficCount = maleficPlanets.length;
 
-        score -= maleficCount;
+        score -= maleficCount; // Keep -1 penalty
         if (maleficCount > 0) {
             reasoningParts.push(`Challenges indicated by harsh planets in 7th House (${maleficPlanets.map(p => p.name).join(", ")})`);
         }
     }
 
-    // Lord of 7th in Kendra/Trikona (+1.5)
+    // Lord of 7th Logic
     const seventhSign = seventhHouse?.sign || "Aries";
     const seventhLord = getPlanetForSign(seventhSign);
     const seventhLordHouse = chartData.houses.find(h =>
         h.planets.some(p => p.name === seventhLord)
     )?.house;
-    if (seventhLordHouse && ([1, 4, 7, 10, 5, 9] as number[]).includes(seventhLordHouse)) {
-        score += 1.5;
-        reasoningParts.push("Lord of Relationships is securely placed, favoring commitment");
+
+    if (seventhLordHouse) {
+        if ([1, 4, 7, 10, 5, 9].includes(seventhLordHouse)) {
+            score += 1.0; // Reduced from 1.5
+            reasoningParts.push("Lord of Relationships is securely placed, favoring commitment");
+        } else if ([6, 8, 12].includes(seventhLordHouse)) {
+            score -= 1.5; // Penalty
+            reasoningParts.push(`Lord of Relationships in House ${seventhLordHouse} suggests emotional separation or delays`);
+        }
     }
 
     // Venus strength
@@ -341,25 +357,26 @@ export function evaluateLove(chartData: ChartData): LoveEvaluationResult {
 // =============================================================================
 
 export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEvaluationResult): ManifestationEvaluationResult {
-    let score = 2; // Base
+    let score = 5; // Base: Average Manifestation
     let reasoningParts: string[] = [];
 
-    // 11th house planets (+1 each)
+    // 11th house planets (+0.5 each, adjusted)
     const eleventhHouse = chartData.houses.find(h => h.house === 11);
     if (eleventhHouse) {
-        score += eleventhHouse.planets.length;
+        score += eleventhHouse.planets.length * 0.5;
         if (eleventhHouse.planets.length > 0) {
             reasoningParts.push(`Active 11th House (${eleventhHouse.planets.map(p => p.name).join(", ")}) signifies gains and networking`);
         }
     }
 
-    // Lord of 11th strong (+2)
+    // Lord of 11th Logic
     const eleventhSign = eleventhHouse?.sign || "Aries";
     const eleventhLord = getPlanetForSign(eleventhSign);
     const eleventhLordHouse = chartData.houses.find(h =>
         h.planets.some(p => p.name === eleventhLord)
     );
     if (eleventhLordHouse) {
+        // Strong Sign Logic (Existing)
         const sign = eleventhLordHouse.sign;
         const planet = eleventhLord;
         const exaltedOwn: Record<string, string[]> = {
@@ -372,34 +389,46 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
             "Saturn": ["Capricorn", "Aquarius", "Libra"]
         };
         if (exaltedOwn[planet]?.includes(sign)) {
-            score += 2;
+            score += 1.5; // Reduced from 2
             reasoningParts.push(`Lord of Gains (${eleventhLord}) is strong in ${sign}, amplifying results`);
+        }
+
+        // Penalty Logic
+        if ([6, 8, 12].includes(eleventhLordHouse.house)) {
+            score -= 1.5;
+            reasoningParts.push(`Lord of Gains in challenging placement (House ${eleventhLordHouse.house}) indicates fluctuating income`);
         }
     }
 
-    // 3rd house malefics (+1.5)
+    // 3rd house malefics (+1.0)
     const thirdHouse = chartData.houses.find(h => h.house === 3);
     if (thirdHouse) {
         const malefics = ["Mars", "Saturn", "Sun", "Rahu"];
         const maleficCount = thirdHouse.planets
             .filter(p => malefics.includes(p.name))
             .length;
-        score += maleficCount * 1.5;
+        score += maleficCount * 1.0; // Reduced from 1.5
         if (maleficCount > 0) {
             reasoningParts.push("Malefics in 3rd House boost courage and self-effort");
         }
     }
 
-    // Lord of 3rd strong (+1)
+    // Lord of 3rd Logic
     const thirdSign = thirdHouse?.sign || "Aries";
     const thirdLord = getPlanetForSign(thirdSign);
     const thirdLordHouse = chartData.houses.find(h =>
         h.planets.some(p => p.name === thirdLord)
     );
     if (thirdLordHouse) {
+        // Strength
         const sign = thirdLordHouse.sign;
         const planet = thirdLord;
         const exaltedOwn = {
+            "Sun": ["Leo", "Aries"],
+            ...SIGN_RULERS // Simplified hack but better to rely on known map. Let's reuse existing map logic or just check sign.
+        };
+        // Re-using the explicit map from above for safety in this scope:
+        const exaltedOwnMap: Record<string, string[]> = {
             "Sun": ["Leo", "Aries"],
             "Moon": ["Cancer", "Taurus"],
             "Mars": ["Aries", "Scorpio", "Capricorn"],
@@ -408,9 +437,16 @@ export function evaluateManifestation(chartData: ChartData, yogaResult: YogaEval
             "Venus": ["Taurus", "Libra", "Pisces"],
             "Saturn": ["Capricorn", "Aquarius", "Libra"]
         };
-        if (exaltedOwn[planet as keyof typeof exaltedOwn]?.includes(sign)) {
+
+        if (exaltedOwnMap[planet as keyof typeof exaltedOwnMap]?.includes(sign)) {
             score += 1;
             reasoningParts.push("Lord of Effort is strong, supporting initiative");
+        }
+
+        // Penalty
+        if ([6, 8, 12].includes(thirdLordHouse.house)) {
+            score -= 1;
+            reasoningParts.push("Lord of Effort in weak house limits initiative");
         }
     }
 
@@ -469,35 +505,45 @@ export function evaluateSupernatural(
     chartData: ChartData,
     yogaResult: YogaEvaluationResult
 ): SupernaturalEvaluationResult {
-    let score = 2; // Base: average intuition
+    let score = 5; // Base: Average Intuition (Functional)
     let reasoningParts: string[] = [];
 
-    // Ketu in 4th, 8th, or 12th (Moksha Houses) (+2)
+    // 1. Penalties (The "Blocked" State)
+    if (isPlanetAfflicted("Moon", chartData)) {
+        score -= 1.5;
+        reasoningParts.push("Emotional turbulence hinders clarity (Afflicted Moon)");
+    }
+    if (isPlanetAfflicted("Jupiter", chartData)) {
+        score -= 1;
+        reasoningParts.push("Lack of spiritual faith or wisdom creates skepticism (Afflicted Jupiter)");
+    }
+
+    // 2. Moksha Houses (4, 8, 12) - The "Open Door"
     const ketuHouse = getPlanetHouse("Ketu", chartData);
     if (ketuHouse && [4, 8, 12].includes(ketuHouse)) {
         score += 2;
         reasoningParts.push(`Ketu in Moksha House (${ketuHouse}) opens door to liberation`);
     }
 
-    // Bonus for Mystical Yogas
+    // 3. Mystical Yogas - The "Gift"
     const mysticalYogas = yogaResult.yogasIdentified.filter(y => y.includes("(Mystical)"));
 
     for (const yoga of mysticalYogas) {
         if (yoga.includes("Guru-Ketu")) {
-            // Check house again for bonus points
+            // Contextual Bonus
             const ketuHouse = getPlanetHouse("Ketu", chartData);
             if (ketuHouse && [8, 12].includes(ketuHouse)) {
                 score += isPlanetAfflicted("Jupiter", chartData) ? 1.5 : 2;
                 reasoningParts.push("Guru-Ketu Yoga in Moksha house indicates profound spiritual wisdom");
             } else {
-                score += 1;
-                reasoningParts.push("Guru-Ketu Yoga detected");
+                score += 2; // Increased from +1 to +2 per user request
+                reasoningParts.push("Guru-Ketu Yoga detected, granting deep spiritual insight");
             }
         }
         if (yoga.includes("Chandra-Node")) {
             const moonSign = getPlanetSign("Moon", chartData);
             if (moonSign && ["Cancer", "Scorpio", "Pisces"].includes(moonSign)) {
-                score += 2; // water sign amplifies
+                score += 2; // Water sign amplifies
                 reasoningParts.push("Chandra-Node Yoga in Water sign heightens psychic sensitivity");
             } else {
                 score += 1.5;
@@ -510,8 +556,13 @@ export function evaluateSupernatural(
         }
     }
 
+    // Default reasoning for "Average" charts
     if (reasoningParts.length === 0) {
-        reasoningParts.push("Latent potential for intuition; no major mystical yogas active");
+        if (score === 5) {
+            reasoningParts.push("Standard intuition; relies on logic and sensory perception");
+        } else if (score < 5) {
+            reasoningParts.push("Intuition may be clouded by skepticism or emotional volatility");
+        }
     }
 
     return {
